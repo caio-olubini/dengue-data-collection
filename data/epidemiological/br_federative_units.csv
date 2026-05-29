@@ -1,0 +1,28 @@
+CODE,NAME,ABBREVIATION,REGION
+35,São Paulo,SP,SE
+41,Paraná,PR,SU
+42,Santa Catarina,SC,SU
+43,Rio Grande do Sul,RS,SU
+50,Mato Grosso do Sul,MS,CO
+11,Rondônia,RO,NO
+12,Acre,AC,NO
+13,Amazonas,AM,NO
+14,Roraima,RR,NO
+15,Pará,PA,NO
+16,Amapá,AP,NO
+17,Tocantins,TO,NO
+21,Maranhão,MA,NE
+24,Rio Grande do Norte,RN,NE
+25,Paraíba,PB,NE
+26,Pernambuco,PE,NE
+27,Alagoas,AL,NE
+28,Sergipe,SE,NE
+29,Bahia,BA,NE
+31,Minas Gerais,MG,SE
+33,Rio de Janeiro,RJ,SE
+51,Mato Grosso,MT,CO
+52,Goiás,GO,CO
+53,Distrito Federal,DF,CO
+22,Piauí,PI,NE
+23,Ceará,CE,NE
+32,Espírito Santo,ES,SE

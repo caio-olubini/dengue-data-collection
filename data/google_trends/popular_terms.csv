@@ -1,0 +1,118 @@
+group,group_pt,terms,exclude,main,is_code
+Arthralgia,Artralgia,Dor na junta,FALSE,FALSE,FALSE
+Arthralgia,Artralgia,Dor no corpo,FALSE,FALSE,FALSE
+Arthralgia,Artralgia,Dor nas articulações,FALSE,FALSE,FALSE
+Arthralgia,Artralgia,Dor na munheca,FALSE,FALSE,FALSE
+Arthralgia,Artralgia,Dor articular,FALSE,FALSE,FALSE
+Arthralgia,Artralgia,Quebradeira,FALSE,FALSE,FALSE
+Arthralgia,Artralgia,Derrubada,FALSE,FALSE,FALSE
+Arthralgia,Artralgia,Dor nos ossos,FALSE,FALSE,FALSE
+Arthralgia,Artralgia,/m/021hck,FALSE,TRUE,TRUE
+Myalgia,Mialgia,Dor no corpo,FALSE,FALSE,FALSE
+Myalgia,Mialgia,Dor muscular,FALSE,FALSE,FALSE
+Myalgia,Mialgia,Dor nas pernas,FALSE,FALSE,FALSE
+Myalgia,Mialgia,/m/013677,FALSE,TRUE,TRUE
+Chest pain,Dor no peito,Aflição no peito,FALSE,FALSE,FALSE
+Chest pain,Dor no peito,Pressão no peito,FALSE,FALSE,FALSE
+Chest pain,Dor no peito,/m/02np4v,FALSE,TRUE,TRUE
+Chest pain,Dor no peito,Aperto no peito,FALSE,FALSE,FALSE
+Headache,Cefaleia,Dor de cabeça,FALSE,FALSE,FALSE
+Headache,Cefaleia,Enxaqueca,FALSE,FALSE,FALSE
+Headache,Cefaleia,/m/0j5fv,FALSE,TRUE,TRUE
+Retro-orbital pain,Dor retro-orbital,Dor retro-orbital,FALSE,TRUE,FALSE
+Retro-orbital pain,Dor retro-orbital,Dor ocular,FALSE,FALSE,FALSE
+Retro-orbital pain,Dor retro-orbital,Dor atrás dos olhos,FALSE,FALSE,FALSE
+Retro-orbital pain,Dor retro-orbital,Dor no olho,FALSE,FALSE,FALSE
+Retro-orbital pain,Dor retro-orbital,Vista doendo,FALSE,FALSE,FALSE
+Retro-orbital pain,Dor retro-orbital,Olhos ardidos,FALSE,FALSE,FALSE
+Pain behind the eyes,Dor atrás dos olhos,Dor atrás dos olhos,FALSE,TRUE,FALSE
+Eye pain,Dor ocular,Dor ocular,FALSE,TRUE,FALSE
+Sore throat,Dor de garganta,Dor de garganta,FALSE,FALSE,FALSE
+Sore throat,Dor de garganta,Garganta doída,FALSE,FALSE,FALSE
+Sore throat,Dor de garganta,/m/0b76bty,FALSE,TRUE,TRUE
+Nausea,Náusea,Estômago embrulhado,FALSE,FALSE,FALSE
+Nausea,Náusea,Enjôo,FALSE,FALSE,FALSE
+Nausea,Náusea,Estômago ruim,FALSE,FALSE,FALSE
+Nausea,Náusea,Tonteira,FALSE,FALSE,FALSE
+Nausea,Náusea,Vontade de vomitar,FALSE,FALSE,FALSE
+Nausea,Náusea,Sensação de cabeça girando,FALSE,FALSE,FALSE
+Nausea,Náusea,/m/0gxb2,FALSE,TRUE,TRUE
+Vomiting,Vômito,Vômito,FALSE,FALSE,FALSE
+Vomiting,Vômito,/m/012qjw,FALSE,TRUE,TRUE
+Diarrhea,Diarreia,Caganeira,FALSE,FALSE,FALSE
+Diarrhea,Diarreia,Dor de barriga,FALSE,FALSE,FALSE
+Diarrhea,Diarreia,Desarranjo,FALSE,FALSE,FALSE
+Diarrhea,Diarreia,Intestino solto,FALSE,FALSE,FALSE
+Diarrhea,Diarreia,Piriri,FALSE,FALSE,FALSE
+Diarrhea,Diarreia,/m/0f3kl,FALSE,TRUE,TRUE
+Dyspnea,Dispneia,Falta de ar,FALSE,FALSE,FALSE
+Dyspnea,Dispneia,Dificuldade de respirar,FALSE,FALSE,FALSE
+Dyspnea,Dispneia,Sem ar,FALSE,FALSE,FALSE
+Dyspnea,Dispneia,/m/01cdt5,FALSE,TRUE,TRUE
+Cough,Tosse,Tosse,FALSE,FALSE,FALSE
+Cough,Tosse,Pigarro,FALSE,FALSE,FALSE
+Cough,Tosse,/m/01b_21,FALSE,TRUE,TRUE
+Cognitive dysfunction,Disfunção cognitiva,Abobado,FALSE,FALSE,FALSE
+Cognitive dysfunction,Disfunção cognitiva,Lesado,FALSE,FALSE,FALSE
+Cognitive dysfunction,Disfunção cognitiva,Tontura,FALSE,FALSE,FALSE
+Cognitive dysfunction,Disfunção cognitiva,Leseira,FALSE,FALSE,FALSE
+Cognitive dysfunction,Disfunção cognitiva,Confuso,FALSE,FALSE,FALSE
+Cognitive dysfunction,Disfunção cognitiva,Pensamento lento,FALSE,FALSE,FALSE
+Cognitive dysfunction,Disfunção cognitiva,Abestado,FALSE,FALSE,FALSE
+Cognitive dysfunction,Disfunção cognitiva,Leso,FALSE,FALSE,FALSE
+Cognitive dysfunction,Disfunção cognitiva,Abobalhado,FALSE,FALSE,FALSE
+Cognitive dysfunction,Disfunção cognitiva,Disfunção cognitiva,FALSE,TRUE,FALSE
+Fatigue,Fadiga,Cansaço,FALSE,FALSE,FALSE
+Fatigue,Fadiga,Moleza,FALSE,FALSE,FALSE
+Fatigue,Fadiga,Fraqueza,FALSE,FALSE,FALSE
+Fatigue,Fadiga,Corpo mole,FALSE,FALSE,FALSE
+Fatigue,Fadiga,Piema,FALSE,FALSE,FALSE
+Fatigue,Fadiga,/m/01j6t0,FALSE,TRUE,TRUE
+Fever,Febre,Corpo esquentando,FALSE,FALSE,FALSE
+Fever,Febre,Suadeira,FALSE,FALSE,FALSE
+Fever,Febre,Corpo quente,FALSE,FALSE,FALSE
+Fever,Febre,/m/0cjf0,FALSE,TRUE,TRUE
+Chills,Calafrio,Calafrio,FALSE,TRUE,FALSE
+Chills,Calafrio,Tremedeira,FALSE,FALSE,FALSE
+Chills,Calafrio,Arrepio,FALSE,FALSE,FALSE
+Chills,Calafrio,Frio,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Calombos na pele,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Mancha na pele,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Caroço,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Coceira,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Perebas,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Brotoeja,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Ferida na pele,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Irritação,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Bolha no corpo,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Pipoco de pele,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Furunco,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Carnegão,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Pintas,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Vermelhidão,FALSE,FALSE,FALSE
+Skin rash,Erupção cutânea,Erupção cutânea,FALSE,TRUE,FALSE
+Arthritis,Artrite,Inchaço nas juntas,FALSE,FALSE,FALSE
+Arthritis,Artrite,Inchaço nas dobras,FALSE,FALSE,FALSE
+Arthritis,Artrite,Inchaço,FALSE,FALSE,FALSE
+Arthritis,Artrite,Inchaço articular,FALSE,FALSE,FALSE
+Arthritis,Artrite,/m/0t1t,FALSE,TRUE,TRUE
+Loss of smell or taste,Perda de olfato ou paladar,Não sentir gosto e cheiro,FALSE,FALSE,FALSE
+Alteration of taste or smell,Alteração de olfato ou paladar,Boca amarga,FALSE,FALSE,FALSE
+Loss of smell or taste,Perda de olfato ou paladar,/m/0m7pl,FALSE,TRUE,TRUE
+Loss of smell or taste,Perda de olfato ou paladar,/m/05sfr2,FALSE,TRUE,TRUE
+Alteration of taste or smell,Alteração de olfato ou paladar,/m/01d3gn,FALSE,TRUE,TRUE
+Alteration of taste or smell,Alteração de olfato ou paladar,/m/04czcv_,FALSE,TRUE,TRUE
+Loss of smell,Perda de olfato,/m/0m7pl,FALSE,TRUE,TRUE
+Loss of taste,Perda do paladar,/m/05sfr2,FALSE,TRUE,TRUE
+Alteration of taste,Alteração do paladar,/m/01d3gn,FALSE,TRUE,TRUE
+Alteration of smell,Alteração de olfato,/m/04czcv_,FALSE,TRUE,TRUE
+Muscle stiffness,Rigidez muscular,Rigidez muscular,FALSE,TRUE,FALSE
+Muscle stiffness,Rigidez muscular,Braços ou pernas endurecidas,FALSE,FALSE,FALSE
+Muscle stiffness,Rigidez muscular,Braço endurecido,FALSE,FALSE,FALSE
+Muscle stiffness,Rigidez muscular,Braços endurecidos,FALSE,FALSE,FALSE
+Muscle stiffness,Rigidez muscular,perna endurecida,FALSE,FALSE,FALSE
+Muscle stiffness,Rigidez muscular,pernas endurecidas,FALSE,FALSE,FALSE
+Muscle stiffness,Rigidez muscular,Juntas duras,FALSE,FALSE,FALSE
+Muscle stiffness,Rigidez muscular,Corpo travado,FALSE,FALSE,FALSE
+Muscle stiffness,Rigidez muscular,Entrevado,FALSE,FALSE,FALSE
+Muscle stiffness,Rigidez muscular,Dificuldade em movimentar,FALSE,FALSE,FALSE
