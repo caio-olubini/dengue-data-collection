@@ -22,12 +22,18 @@ data/bulletins/2025/
 data/bulletins/2026/
 data/bulletins/manifest.csv
 data/bulletins/failures.csv
-data/news/dengue/state.json
-data/news/dengue/manifest.jsonl
-data/news/dengue/listings/
-data/news/dengue/articles/
+# one subdirectory per configured EBC query (see sources.ebc.queries)
+data/news/*/state.json
+data/news/*/manifest.jsonl
+data/news/*/listings/
+data/news/*/articles/
 
 # Final outputs (large)
 data/epidemiological/Arbo_SARI_disease_table.csv
+
+# Python / uv
+.venv/
+__pycache__/
+*.py[cod]
 
 ###

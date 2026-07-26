@@ -1,0 +1,32 @@
+[project]
+name = "arboili"
+version = "0.1.0"
+description = "ARBOILI — reproducible data paper on digital surveillance of arboviruses and respiratory syndromes in Brazil"
+requires-python = ">=3.12"
+dependencies = [
+    # Core HTTP & scraping
+    "requests==2.34.2",
+    "beautifulsoup4==4.14.3",
+    # Data processing
+    "pandas==3.0.3",
+    "python-dateutil==2.9.0.post0",
+    # Google Trends
+    "pytrends==4.9.2",
+    # pytrends passes Retry(method_whitelist=...), removed in urllib3 2.x.
+    # Without this pin every gt-search request fails with a TypeError.
+    "urllib3<2",
+    # Configuration
+    "pyyaml==6.0.2",
+    # Notebook runtime
+    "ipykernel==7.2.0",
+]
+
+[project.scripts]
+arboili = "src.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]

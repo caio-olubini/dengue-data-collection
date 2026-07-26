@@ -1,0 +1,68 @@
+# ARBOILI extraction configuration
+#
+# Every value here is a default for the `arboili` CLI. Command-line flags
+# override the corresponding key, so this file records the canonical run
+# used for the data paper while still allowing ad-hoc runs.
+#
+#   uv run arboili sinan                 # uses this file
+#   uv run arboili sinan --to-year 2023  # overrides to_year only
+#
+# Relative paths are resolved against the project root (the directory
+# holding this file).
+
+# Base directory for all downloaded data. Every source path below is
+# resolved relative to this unless it is itself absolute.
+data_dir: data
+
+# Shared reference tables used by more than one extractor.
+reference:
+  federative_units: data/epidemiological/br_federative_units.csv
+  popular_terms: data/google_trends/popular_terms.csv
+
+sources:
+
+  # 1 — SINAN dengue case CSVs from the Ministry of Health S3 bucket.
+  sinan:
+    out_dir: data/epidemiological/SINAN
+    from_year: 2010
+    to_year: 2026        # 2025 not yet published upstream
+    keep_zip: false      # keep the downloaded .zip alongside the extracted CSV
+
+  # 2 — Google Trends weekly search index, 5-year window, 27 UFs + BR.
+  # Runtime ~5 min. Resumable via manifest_search.csv.
+  gt_search:
+    out_dir: data/google_trends
+    reference_date: 2024-12-31   # end of the 5-year window; fixed for reproducibility
+    sleep: 2.0                   # seconds between requests; raise if you hit HTTP 429
+
+  # 3 — Google Trends related topics & queries, monthly, 27 UFs + BR.
+  # ~13,400 requests ≈ 18 h at sleep=5. Resumable via manifest_related.csv.
+  gt_related:
+    out_dir: data/google_trends
+    start_month: "2020-01"
+    sleep: 5.0
+
+  # 4 — INMET annual meteorological ZIPs.
+  climate:
+    out_dir: data/climate
+    from_year: 2000
+    to_year: null        # null = current year
+
+  # 5 — Ministry of Health epidemiological bulletin PDFs.
+  bulletins:
+    out_dir: data/bulletins
+    from_year: 2019
+    to_year: null        # null = current year
+
+  # 6 — EBC / Agência Brasil news articles.
+  # `queries` drives one scrape per entry; each writes to <out_dir>/<name>.
+  ebc:
+    out_dir: data/news
+    site: agenciabrasil
+    types: [noticia, pagina]
+    per_page: 100
+    max_pages: 10000
+    delay: 1.0
+    queries:
+      - name: dengue
+        query: dengue
