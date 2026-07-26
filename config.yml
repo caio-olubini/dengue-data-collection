@@ -66,3 +66,23 @@ sources:
     queries:
       - name: dengue
         query: dengue
+
+# Transformation stages, run after collection with `arboili transform <stage>`.
+pipeline:
+
+  # SINAN case-level CSVs -> weekly case series by epi week, state and
+  # final classification. Case counts only; no symptom columns.
+  sinan:
+    in_dir: data/epidemiological/SINAN
+    out_dir: data/epidemiological/SINAN
+    disease: dengue        # dengue | chikungunya (no chikungunya files yet)
+    from_year: null        # null = every DENGBR*.csv found
+    to_year: null
+    # Kept records satisfy dif_lower < (symptom onset - notification) < dif_upper,
+    # in days. Both bounds strict, matching the R pipeline these defaults
+    # reproduce: the lower bound drops data-entry errors (a birth date typed into
+    # the onset field), the upper bound drops onsets recorded after their own
+    # notification. The article's prose describes only the 180-day rule.
+    dif_lower: -180
+    dif_upper: 1
+    formats: [parquet, csv_gz]   # parquet is primary; csv.gz is for R

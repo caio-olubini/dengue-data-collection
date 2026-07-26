@@ -9,8 +9,10 @@ calls, so the CLI and `data_collection.ipynb` stay in step.
     uv run arboili sinan --to-year 2023      # override a single setting
     uv run arboili all                       # everything except gt-related
     uv run arboili ebc --query chikungunya   # ad-hoc EBC scrape
+    uv run arboili transform sinan           # build the SINAN case series
 
 All extractors are idempotent and resumable, so re-running is always safe.
+Transformations are pure functions of the downloaded files, so they are too.
 """
 
 from __future__ import annotations
@@ -21,15 +23,23 @@ import sys
 from argparse import Namespace
 from datetime import datetime
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from ..common import ExtractResult
 from ..config import Config, as_date, load_config, pick
+
+if TYPE_CHECKING:
+    from ..pipeline.sinan import SinanTransformResult
 
 log = logging.getLogger("arboili")
 
 # Sources run by `arboili all`, in pipeline order. gt-related is deliberately
 # excluded — it is an ~18-hour job that should be started on its own.
 ALL_SOURCES = ["sinan", "gt-search", "climate", "bulletins", "ebc"]
+
+# Mirrors src.pipeline.sinan.SPECS. Spelled out here so building the parser
+# doesn't import polars — `arboili --help` should stay instant.
+SPEC_NAMES = ("dengue", "chikungunya")
 
 
 # ---------------------------------------------------------------------------
@@ -134,6 +144,27 @@ def run_ebc(cfg: Config, args: Namespace) -> ExtractResult:
     return combined
 
 
+def run_transform_sinan(cfg: Config, args: Namespace) -> "SinanTransformResult":
+    """Aggregate the downloaded SINAN CSVs into the weekly case series."""
+    from ..pipeline.sinan import SPECS, transform
+
+    settings = cfg.pipeline("sinan")
+    spec = SPECS[pick(args.disease, settings.get("disease"), "dengue")]
+    default_dir = "data/epidemiological/SINAN"
+
+    return transform(
+        in_dir=cfg.resolve(pick(args.input_dir, settings.get("in_dir"), default_dir)),
+        out_dir=cfg.resolve(pick(args.output_dir, settings.get("out_dir"), default_dir)),
+        fu_path=cfg.reference("federative_units"),
+        spec=spec,
+        from_year=pick(args.from_year, settings.get("from_year")),
+        to_year=pick(args.to_year, settings.get("to_year")),
+        dif_lower=pick(args.dif_lower, settings.get("dif_lower"), -180),
+        dif_upper=pick(args.dif_upper, settings.get("dif_upper"), 1),
+        formats=pick(args.formats, settings.get("formats"), ["parquet", "csv_gz"]),
+    )
+
+
 RUNNERS = {
     "sinan": run_sinan,
     "gt-search": run_gt_search,
@@ -141,6 +172,12 @@ RUNNERS = {
     "climate": run_climate,
     "bulletins": run_bulletins,
     "ebc": run_ebc,
+}
+
+# Transformation stages, run after collection. Keyed the same way as RUNNERS so
+# `main()` dispatches both through one path.
+TRANSFORMS = {
+    "sinan": run_transform_sinan,
 }
 
 
@@ -199,6 +236,26 @@ def build_parser() -> argparse.ArgumentParser:
     p_all = sub.add_parser("all", help=f"Run, in order: {', '.join(ALL_SOURCES)}")
     p_all.add_argument("--output-dir", type=Path, help=argparse.SUPPRESS)
 
+    p_transform = sub.add_parser(
+        "transform", help="Turn downloaded data into analysis tables"
+    )
+    transform_sub = p_transform.add_subparsers(dest="stage", metavar="STAGE")
+
+    p_tf_sinan = transform_sub.add_parser(
+        "sinan", help="Weekly SINAN case series by epi week, state and classification"
+    )
+    p_tf_sinan.add_argument("--input-dir", type=Path, help="Where the yearly CSVs live")
+    p_tf_sinan.add_argument("--output-dir", type=Path, help="Where to write the series")
+    p_tf_sinan.add_argument("--disease", choices=sorted(SPEC_NAMES),
+                            help="Which SINAN database to transform (default: dengue)")
+    _add_year_range(p_tf_sinan)
+    p_tf_sinan.add_argument("--dif-lower", type=int,
+                            help="Lower bound, in days, on (symptom onset - notification)")
+    p_tf_sinan.add_argument("--dif-upper", type=int,
+                            help="Upper bound, in days, on (symptom onset - notification)")
+    p_tf_sinan.add_argument("--formats", nargs="+", choices=["parquet", "csv_gz"],
+                            help="Output formats to write")
+
     return parser
 
 
@@ -211,6 +268,7 @@ def _defaults_for(command: str, args: Namespace) -> Namespace:
     known = {
         "output_dir", "from_year", "to_year", "keep_zip", "reference_date", "sleep",
         "start_month", "query", "site", "types", "per_page", "max_pages", "delay", "restart",
+        "input_dir", "disease", "dif_lower", "dif_upper", "formats",
     }
     merged = Namespace(**vars(args))
     for flag in known:
@@ -238,11 +296,24 @@ def main(argv: list[str] | None = None) -> int:
             marker = " " if name in ALL_SOURCES else "*"
             print(f"{marker} {name:<12} {settings or '(no config block)'}")
         print("\n* not included in `arboili all` — long-running, start it separately")
+        print("\nTransformations (arboili transform <stage>):")
+        for name in TRANSFORMS:
+            print(f"  {name:<12} {cfg.pipeline(name) or '(no config block)'}")
         return 0
 
     if not args.command:
         parser.print_help()
         return 1
+
+    if args.command == "transform":
+        stage = getattr(args, "stage", None)
+        if not stage:
+            print(f"Pick a stage: {', '.join(TRANSFORMS)}", file=sys.stderr)
+            return 1
+        print(f"\n{'=' * 70}\ntransform {stage}\n{'=' * 70}", flush=True)
+        result = TRANSFORMS[stage](cfg, _defaults_for(stage, args))
+        print(result, flush=True)
+        return 0 if result.failed == 0 else 1
 
     commands = ALL_SOURCES if args.command == "all" else [args.command]
     failed = 0

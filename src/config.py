@@ -40,6 +40,15 @@ class Config:
         """Return the settings block for one source (empty dict if absent)."""
         return dict(self._raw.get("sources", {}).get(name) or {})
 
+    def pipeline(self, name: str) -> dict[str, Any]:
+        """Return the settings block for one transformation stage.
+
+        Kept separate from `source` because collection and transformation are
+        different phases: a source says where to download from, a pipeline stage
+        says how to reshape what was downloaded.
+        """
+        return dict(self._raw.get("pipeline", {}).get(name) or {})
+
 
 def load_config(path: Path | None = None) -> Config:
     config_path = Path(path) if path else DEFAULT_CONFIG_PATH

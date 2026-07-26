@@ -1,6 +1,59 @@
-# ARBOILI — Digital Surveillance of Arboviruses in Brazil
+# arbovirus-surveillance-data
 
-ARBOILI is a reproducible data paper on digital surveillance of arboviruses (dengue, chikungunya) and respiratory syndromes (SARI/influenza, COVID-19) in Brazil. It collects, transforms, and publishes a multi-source dataset that links official epidemiological case counts (SINAN and SIVEP-Gripe), digital search behaviour (Google Trends weekly search interest plus monthly related topics and queries), meteorological observations (INMET), Ministry of Health epidemiological bulletins, and press coverage from Agência Brasil (EBC). Every source is stratified by Brazilian federative unit — 26 states, the Federal District, and a national aggregate — and aligned temporally so the series can be used directly for surveillance modelling. Python modules under `src/` handle extraction; R scripts under `r/` handle transformation into the final analysis table.
+Reproducible data pipeline for digital surveillance of arboviruses (dengue,
+chikungunya) and respiratory syndromes (SARI/influenza, COVID-19) in Brazil.
+It collects and transforms a multi-source dataset linking official
+epidemiological case counts (SINAN, SIVEP-Gripe), digital search behaviour
+(Google Trends), meteorological data (INMET), Ministry of Health bulletins,
+and news coverage (Agência Brasil/EBC) — stratified by federative unit (26
+states + DF) and aligned temporally for surveillance modelling.
+
+## Status
+
+- [x] Collection — all six sources (SINAN, SIVEP, Google Trends search + related, climate, bulletins, EBC news)
+- [x] Pipeline — SINAN (`arboili transform sinan`): case-level CSVs → weekly case series
+- [ ] Pipeline — SIVEP-Gripe (SARI): case-level → weekly series
+- [ ] Pipeline — Google Trends: align weekly/monthly series to the epi-week calendar
+- [ ] Pipeline — Climate: station ZIPs → daily/weekly series by state
+- [ ] Pipeline — Bulletins: PDF text extraction (currently stored raw, unparsed)
+- [ ] Pipeline — EBC news: article text extraction (currently stored raw, unparsed)
+- [ ] Final merge: join all series into one `Arbo_SARI_disease_table`
+
+## Project structure
+
+```
+├── src/
+│   ├── collection/       ← extractors: raw data in, nothing transformed
+│   │   ├── cli.py        ← `arboili` CLI entry point
+│   │   ├── epidemiological/   ← SINAN downloader (MoH S3)
+│   │   ├── google_trends/     ← pytrends search + related topics/queries
+│   │   ├── climate/           ← INMET annual ZIP downloader
+│   │   ├── bulletins/         ← MoH bulletin PDF scraper
+│   │   └── ebc/                ← Agência Brasil news scraper
+│   │
+│   ├── pipeline/          ← post-collection transformations
+│   │   └── sinan/         ← case-level CSVs → weekly case series (`arboili transform sinan`)
+│   │
+│   ├── config.py          ← config.yml loader, shared by collection & pipeline
+│   └── common.py          ← shared ExtractResult type
+│
+├── tests/                 ← unit + integrity tests, run on committed fixtures
+├── notebooks/             ← interactive runs of the collection pipeline
+├── config.yml             ← all extraction/transformation settings
+└── data/                  ← downloaded & transformed data (git-ignored)
+```
+
+## Concerns per source
+
+| Source | Concern |
+|---|---|
+| SINAN (dengue cases) | S3 availability varies by year; case-level, aggregated to weekly by `pipeline/sinan` |
+| SIVEP-Gripe (SARI) | Separate registry, processed independently from SINAN |
+| Google Trends search | Relative index (0–100), not absolute volume; rate-limited, resumable |
+| Google Trends related | ~13k requests, ~18h resumable run; saves after every request |
+| Climate (INMET) | Large ZIPs (50–200 MB each); raw ZIPs left unextracted |
+| Bulletins | Scraper depends on MoH's Plone CMS pagination; PDFs stored raw, unparsed |
+| EBC news | Raw HTML only, no text-extraction pipeline yet; resumable via cursor |
 
 ## Installation
 
@@ -13,8 +66,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Then clone the repository and create the environment:
 
 ```bash
-git clone <repository-url>
-cd dengue-data-collection
+git clone https://github.com/caio-olubini/arbovirus-surveillance-data
+cd arbovirus-surveillance-data
 uv sync
 ```
 
@@ -40,18 +93,17 @@ uv run arboili --list
 | `uv run arboili bulletins` | Ministry of Health epidemiological bulletin PDFs | ~20 min |
 | `uv run arboili ebc` | Agência Brasil news articles | ~1 h per query |
 | `uv run arboili all` | Runs sinan, gt-search, climate, bulletins, and ebc in order | ~2 h |
+| `uv run arboili transform sinan` | SINAN case-level CSVs → weekly case series | ~11 s |
 
 `all` deliberately excludes `gt-related`, which is an ~18-hour job better started on its own. Within `all`, a source that fails is logged and the run continues to the next one.
 
-Every extractor is idempotent and resumable: already-downloaded files are skipped, progress is tracked in a `manifest.csv` (or `manifest.jsonl`) per source, and interrupting a run is safe — re-running picks up where it left off. This matters most for `gt-related`, which saves after every successful request and exits gracefully on an HTTP 429.
+Every extractor is idempotent and resumable: already-downloaded files are skipped, progress is tracked in a `manifest.csv` (or `manifest.jsonl`) per source, and interrupting a run is safe — re-running picks up where it left off.
 
 Pass `--verbose` for debug logging, and `--help` on any subcommand for its full flag list.
 
 ### Configuration
 
-Defaults for every source live in [`config.yml`](config.yml) — year ranges, output directories, request delays, the Google Trends reference date, and the list of EBC search queries. This file records the canonical run used for the data paper.
-
-Command-line flags override the file for one-off runs, without editing it:
+Defaults for every source live in [`config.yml`](config.yml) — year ranges, output directories, request delays, the Google Trends reference date, and the list of EBC search queries. Command-line flags override the file for one-off runs:
 
 ```bash
 uv run arboili sinan --to-year 2023          # narrow the year range
@@ -60,47 +112,20 @@ uv run arboili ebc --query chikungunya       # ad-hoc scrape → data/news/chiku
 uv run arboili --config other.yml all        # use a different config file
 ```
 
-Precedence is command-line flag → `config.yml` value → built-in default. Relative paths in the config are resolved against the project root.
+Precedence is command-line flag → `config.yml` value → built-in default.
 
-### Notebook
-
-[`data_collection.ipynb`](data_collection.ipynb) runs the same extractors interactively, reading its settings from `config.yml` so the notebook and CLI stay in step. It also carries the validation section — offline helper tests, a live Google Trends smoke test, an S3 availability probe, and a final inventory of every output file. Launch it with:
+### Tests
 
 ```bash
-uv run jupyter lab            # or open the file in VS Code and pick the .venv kernel
-```
-
-### R transformation scripts
-
-After extraction, run the R scripts in `r/scripts/` in numeric order (`1_` → `2_` → `3_` → `4_`) to aggregate the raw case-level CSVs and merge every source into the final `data/epidemiological/Arbo_SARI_disease_table.csv`. The R side is not managed by uv and needs its own R installation.
-
-## Project layout
-
-```
-├── config.yml              ← all extraction settings
-├── pyproject.toml          ← dependencies and the `arboili` entry point
-├── data_collection.ipynb   ← interactive pipeline + validation
-├── article.pdf             ← the research article
-│
-├── src/                    ← Python extraction modules
-│   ├── cli.py              ← `arboili` command
-│   ├── config.py           ← config.yml loader
-│   ├── common.py           ← shared ExtractResult type
-│   ├── epidemiological/    ← SINAN downloader
-│   ├── google_trends/      ← pytrends wrappers + two extractors
-│   ├── climate/            ← INMET downloader
-│   ├── bulletins/          ← MoH bulletin scraper
-│   └── ebc/                ← Agência Brasil news scraper
-│
-├── data/                   ← all downloaded data (git-ignored)
-└── r/                      ← transformation scripts and functions
+uv run pytest                     # unit + integrity tests, runs on committed fixtures
+uv run pytest -m integration      # re-runs the integrity checks on the full series
 ```
 
 ## Data sources
 
 | Source | Origin | Coverage | Granularity |
 |---|---|---|---|
-| SINAN dengue | MoH open-data S3 bucket | 2010–present | case-level → weekly by state |
+| SINAN dengue | MoH open-data S3 bucket | 2010–2024 | case-level → weekly by state |
 | SIVEP-Gripe (SARI) | MoH | varies–2024 | weekly by state |
 | Google Trends search | pytrends | 2019-12–2024-12 | weekly, 27 UFs + BR |
 | Google Trends related | pytrends | 2020-01–present | monthly, 27 UFs + BR |
@@ -108,12 +133,4 @@ After extraction, run the R scripts in `r/scripts/` in numeric order (`1_` → `
 | Bulletins | gov.br/saude | 2019–2026 | weekly, national |
 | News | Agência Brasil (EBC) | varies–present | article-level, national |
 
-Google Trends values are relative indices (0–100, normalised per request window), not absolute search counts. Disease terms are queried through Freebase topic IDs rather than free text so results are unambiguous across spellings — see `data/google_trends/popular_terms.csv`.
-
-## Notes and caveats
-
-- **Rate limiting.** Google Trends throttles heavy traffic. Both GT extractors sleep between requests (2 s for search, 5 s for related); raise `sleep` in `config.yml` if you see HTTP 429s.
-- **Disk space.** Individual INMET ZIPs run 50–200 MB, and the full SINAN series is several GB.
-- **Upstream fragility.** The bulletin scraper depends on the Ministry of Health's Plone CMS pagination and can break if the site is restructured. SINAN S3 availability varies by year — the notebook's probe cell reports which years are live.
-- **Unparsed sources.** Bulletin PDFs and EBC article HTML are stored raw; no text-extraction pipeline exists for them yet.
-- **urllib3 pin.** `pytrends` 4.9.2 calls `Retry(method_whitelist=...)`, which was removed in urllib3 2.x, so the project pins `urllib3<2`. Without it, every `gt-search` request fails with a `TypeError`.
+Google Trends values are relative indices (0–100, normalised per request window), not absolute search counts. Disease terms are queried through Freebase topic IDs rather than free text — see `data/google_trends/popular_terms.csv`.

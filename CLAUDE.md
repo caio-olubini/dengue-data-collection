@@ -79,6 +79,18 @@ Arboili_datapaper/
 │   │       └── storage.py                ← file I/O + manifest management
 │   │
 │   └── pipeline/                         ← data transformation modules (post-collection)
+│       └── sinan/                        ← SINAN case-level CSVs → weekly case series
+│           ├── README.md                 ← data-flow & methodology write-up (paper material)
+│           ├── spec.py                   ← per-disease schema tiers & column maps
+│           ├── epiweek.py                ← Sunday-anchored epidemiological week
+│           ├── steps.py                  ← the transformation, one testable step at a time
+│           ├── transform.py              ← per-year orchestration + writers
+│           └── integrity.py              ← series-integrity checks (shared by tests & CLI)
+│
+├── tests/
+│   ├── fixtures/sinan/                   ← ~500 KB stratified sample, one file per schema tier
+│   │   └── build_sinan_fixture.py        ← regenerates them from the real CSVs
+│   └── pipeline/sinan/                   ← unit tests + integrity tests
 │
 └── r/
     ├── functions/
@@ -197,13 +209,47 @@ After Python extraction, run R scripts in order (`1_` → `2_` → `3_` → `4_`
 
 All extractors are **idempotent** — safe to re-run. Progress is tracked in `manifest.csv` files per source.
 
+### Transformations
+
+```bash
+uv run arboili transform sinan          # SINAN case-level CSVs → weekly case series
+```
+
+Replaces the SINAN half of `r/scripts/2_transform_sinan_data.R` (whose input glob,
+`dengue_YYYY.csv.gz`, does not match the `DENGBR<YY>.csv` files the downloader
+actually writes). Aggregates ~7 GB across 17 yearly files into
+`SINAN_dengue_cases.parquet` + `.csv.gz` — about 1.06M rows, ~11 s, peak RSS
+~2.1 GB. Case counts only; the symptom columns the R script carries serve a
+separate analysis and are not part of this series.
+
+Output is keyed by (recorded week, notification week, symptom-onset week, final
+classification, state). Notes worth knowing:
+
+- **Epi weeks are Sunday-anchored dates**, matching R's `floor_date(unit="week")`
+  — not `YYYYWW` numbers, and *not* polars' `dt.truncate("1w")`, which anchors on
+  Monday.
+- **`ew_recorded` is null for 2014–2020.** The 2014–2019 exports omit `DT_DIGITA`;
+  the 2020 export declares it but leaves every value empty. Matches the article's
+  Table 1 footnote. The gap is non-monotonic, so it is declared as a year set in
+  `spec.py`, never a threshold.
+- **`state_abbrev` holds a real abbreviation** (`SP`, `RJ`), unlike the R script,
+  which left the numeric IBGE code under that name.
+- **Filter defaults reproduce the R behaviour**: kept records satisfy
+  `-180 < (onset − notification) < 1` in days. Both bounds are strict and
+  configurable; the article's prose describes only the 180-day rule.
+
+```bash
+uv run pytest                     # unit + integrity tests, runs on committed fixtures
+uv run pytest -m integration      # re-runs the integrity checks on the full series
+```
+
 ---
 
 ## Temporal & Geographic Scope
 
 | Source | Start | End | Granularity | Geography |
 |--------|-------|-----|-------------|-----------|
-| SINAN dengue | 2010 | 2024 | yearly files, weekly aggregation in R | state |
+| SINAN dengue | 2010 | 2026 | yearly files → weekly series (`transform sinan`) | state |
 | SIVEP SARI | varies | 2024 | weekly | state |
 | GT search | 2019-12 | 2024-12 | weekly | state + BR |
 | GT related | 2020-01 | present | monthly | state + BR |

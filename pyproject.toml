@@ -10,6 +10,11 @@ dependencies = [
     # Data processing
     "pandas==3.0.3",
     "python-dateutil==2.9.0.post0",
+    # Transformation pipeline. The SINAN CSVs total ~7 GB against ~6 GB of free
+    # RAM, so the pipeline needs lazy scanning with projection pushdown rather
+    # than a full read. Pure Rust wheel with no Python deps, so it cannot
+    # disturb the urllib3 pin above.
+    "polars==1.35.1",
     # Google Trends
     "pytrends==4.9.2",
     # pytrends passes Retry(method_whitelist=...), removed in urllib3 2.x.
@@ -19,6 +24,17 @@ dependencies = [
     "pyyaml==6.0.2",
     # Notebook runtime
     "ipykernel==7.2.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest==8.4.2",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "integration: runs against the full ~7 GB SINAN CSVs (deselect with '-m \"not integration\"')",
 ]
 
 [project.scripts]
