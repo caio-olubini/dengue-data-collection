@@ -22,8 +22,8 @@ from argparse import Namespace
 from datetime import datetime
 from pathlib import Path
 
-from .common import ExtractResult
-from .config import Config, as_date, load_config, pick
+from ..common import ExtractResult
+from ..config import Config, as_date, load_config, pick
 
 log = logging.getLogger("arboili")
 

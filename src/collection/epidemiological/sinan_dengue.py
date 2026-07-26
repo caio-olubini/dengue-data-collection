@@ -41,7 +41,7 @@ from pathlib import Path
 
 import requests
 
-from ..common import ExtractResult
+from ...common import ExtractResult
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_DIR = PROJECT_ROOT / "data"

@@ -32,7 +32,7 @@ from pathlib import Path
 import pandas as pd
 
 from .gtrends_api import _make_client, try_gtrends_api
-from ..common import ExtractResult
+from ...common import ExtractResult
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent  # src/google_trends -> src -> root
 DATA_DIR = PROJECT_ROOT / "data"

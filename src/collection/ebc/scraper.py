@@ -34,7 +34,7 @@ from .http_client import http_get, make_session
 from .models import Article, State
 from .parsers import build_search_url, parse_listing, parse_total_pages, utc_now_iso
 from .storage import Storage
-from ..common import ExtractResult
+from ...common import ExtractResult
 
 log = logging.getLogger("ebc")
 

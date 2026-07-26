@@ -22,7 +22,7 @@ dependencies = [
 ]
 
 [project.scripts]
-arboili = "src.cli:main"
+arboili = "src.collection.cli:main"
 
 [build-system]
 requires = ["hatchling"]

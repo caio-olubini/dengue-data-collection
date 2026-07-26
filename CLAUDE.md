@@ -55,24 +55,30 @@ Arboili_datapaper/
 │           ├── listings/                 ← raw search result HTML
 │           └── articles/                 ← saved article HTML
 │
-├── src/                                  ← Python extraction modules
+├── src/
 │   ├── common.py                         ← ExtractResult dataclass (shared return type)
-│   ├── epidemiological/
-│   │   └── sinan_dengue.py               ← downloads SINAN CSVs from MoH S3
-│   ├── google_trends/
-│   │   ├── gtrends_api.py                ← pytrends wrapper + helpers
-│   │   ├── extract_gt_search.py          ← 5-year weekly search index extractor
-│   │   └── extract_gt_related.py         ← monthly related topics & queries extractor
-│   ├── climate/
-│   │   └── download_inmet_data.py        ← INMET annual ZIP downloader
-│   ├── bulletins/
-│   │   └── download_boletins.py          ← MoH bulletin PDF scraper
-│   └── ebc/
-│       ├── scraper.py                    ← EBC/Agência Brasil news scraper
-│       ├── http_client.py                ← HTTP session + retry logic
-│       ├── models.py                     ← Article, State dataclasses
-│       ├── parsers.py                    ← HTML parsing utilities
-│       └── storage.py                    ← file I/O + manifest management
+│   ├── config.py                         ← config.yml loader, shared by collection & pipeline
+│   │
+│   ├── collection/                       ← extraction modules (raw data in, nothing transformed)
+│   │   ├── cli.py                        ← `arboili` CLI entry point, wraps every extractor
+│   │   ├── epidemiological/
+│   │   │   └── sinan_dengue.py           ← downloads SINAN CSVs from MoH S3
+│   │   ├── google_trends/
+│   │   │   ├── gtrends_api.py            ← pytrends wrapper + helpers
+│   │   │   ├── extract_gt_search.py      ← 5-year weekly search index extractor
+│   │   │   └── extract_gt_related.py     ← monthly related topics & queries extractor
+│   │   ├── climate/
+│   │   │   └── download_inmet_data.py    ← INMET annual ZIP downloader
+│   │   ├── bulletins/
+│   │   │   └── download_boletins.py      ← MoH bulletin PDF scraper
+│   │   └── ebc/
+│   │       ├── scraper.py                ← EBC/Agência Brasil news scraper
+│   │       ├── http_client.py            ← HTTP session + retry logic
+│   │       ├── models.py                 ← Article, State dataclasses
+│   │       ├── parsers.py                ← HTML parsing utilities
+│   │       └── storage.py                ← file I/O + manifest management
+│   │
+│   └── pipeline/                         ← data transformation modules (post-collection)
 │
 └── r/
     ├── functions/
